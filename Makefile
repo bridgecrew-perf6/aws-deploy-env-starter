@@ -16,6 +16,10 @@ else
 SED = sed
 endif
 
+ifndef TMPDIR
+TMPDIR = /tmp
+endif
+
 WORKDIR = $(TMPDIR)/aws-deploy-env
 
 .PHONY: all
