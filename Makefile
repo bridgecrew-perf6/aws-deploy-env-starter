@@ -5,7 +5,7 @@ endif
 .NOTPARALLEL:
 .SILENT:
 .ONESHELL:
-.DELETEONERROR:
+.DELETE_ON_ERROR:
 
 ifdef MAKE_SHELL
 SHELL = $(MAKE_SHELL)
@@ -22,6 +22,10 @@ TMPDIR = /tmp
 endif
 
 WORKDIR = $(TMPDIR)/aws-deploy-env
+
+ifdef SHELL_DEBUG
+	$(warning make features: $(.FEATURES))
+endif
 
 .PHONY: all
 all:   $(WORKDIR) $(WORKDIR)/tool-versions.txt $(WORKDIR)/aws-caller-identity.txt
