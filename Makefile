@@ -4,7 +4,8 @@ endif
 
 .NOTPARALLEL:
 .SILENT:
-.ONESHELL: 
+.ONESHELL:
+.DELETEONERROR:
 
 ifdef MAKE_SHELL
 SHELL = $(MAKE_SHELL)
@@ -32,6 +33,9 @@ $(WORKDIR):
 # also making sure all the required tools are present
 TOOLS := $(MAKE) aws  $(SHELL) $(SED) git
 $(WORKDIR)/tool-versions.txt: Makefile
+ifdef SHELL_DEBUG
+	set -x
+endif
 	set -ue -o pipefail
 	echo -n > $@
 
@@ -46,6 +50,9 @@ $(WORKDIR)/tool-versions.txt: Makefile
 
 # ensure user has working awscli
 $(WORKDIR)/aws-caller-identity.txt: Makefile
+ifdef SHELL_DEBUG
+	set -x
+endif
 	set -ue -o pipefail
 	aws sts get-caller-identity > $@
 	echo "awscli login:"
