@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create VPC
+Resources:
+
+  NonDefaultVpc:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.10.0.0/16
+
+  SubnetOne:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId:
+        Ref: NonDefaultVpc
+      CidrBlock: 10.10.1.0/24
+      AvailabilityZone: "us-east-2a"
+
+  SubnetTwo:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId:
+        Ref: NonDefaultVpc
+      CidrBlock: 10.10.2.0/24
+      AvailabilityZone: "us-east-2b"
+
+Outputs:
+  DefaultNetworkAcl:
+    Description: The DefaultNetworkAcl
+    Value: !GetAtt NonDefaultVpc.DefaultNetworkAcl
+  VpcId:
+    Description: The VPC id
+    Value: !GetAtt SubnetOne.VpcId

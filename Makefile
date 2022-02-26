@@ -27,8 +27,10 @@ ifdef SHELL_DEBUG
 $(warning make features: $(.FEATURES))
 endif
 
+CFN_TEMPLATES = $(WORKDIR)/create-s3.yaml
+
 .PHONY: all
-all:   $(WORKDIR) $(WORKDIR)/tool-versions.txt $(WORKDIR)/aws-caller-identity.txt
+all:   $(WORKDIR) $(WORKDIR)/tool-versions.txt $(WORKDIR)/aws-caller-identity.txt $(CFN_TEMPLATES)
 	echo success
 
 $(WORKDIR):
@@ -36,11 +38,11 @@ $(WORKDIR):
 
 # also making sure all the required tools are present
 TOOLS := $(MAKE) aws  $(SHELL) $(SED) git jinja2 cfn-lint
-$(WORKDIR)/tool-versions.txt: Makefile
+$(WORKDIR)/tool-versions.txt:
 ifdef SHELL_DEBUG
 	set -x
 endif
-	set -ue -o pipefail
+	set -ue
 	echo -n > $@
 
 	for TOOL in $(TOOLS) ; do 
@@ -53,11 +55,11 @@ endif
 	echo
 
 # ensure user has working awscli
-$(WORKDIR)/aws-caller-identity.txt: Makefile
+$(WORKDIR)/aws-caller-identity.txt:
 ifdef SHELL_DEBUG
 	set -x
 endif
-	set -ue -o pipefail
+	set -ue
 	aws sts get-caller-identity > $@
 	echo "awscli login:"
 	echo "------------"
@@ -67,3 +69,7 @@ endif
 .PHONY: clean
 clean:
 	rm -rf $(WORKDIR)
+
+$(WORKDIR)/%.yaml : %.tmpl params.json
+	jinja2 --format json --strict -o $@ $< params.json
+	cfn-lint $@
