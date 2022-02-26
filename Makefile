@@ -24,7 +24,7 @@ endif
 WORKDIR = $(TMPDIR)/aws-deploy-env
 
 ifdef SHELL_DEBUG
-	$(warning make features: $(.FEATURES))
+$(warning make features: $(.FEATURES))
 endif
 
 .PHONY: all
@@ -35,7 +35,7 @@ $(WORKDIR):
 	mkdir $@
 
 # also making sure all the required tools are present
-TOOLS := $(MAKE) aws  $(SHELL) $(SED) git
+TOOLS := $(MAKE) aws  $(SHELL) $(SED) git jinja2 cfn-lint
 $(WORKDIR)/tool-versions.txt: Makefile
 ifdef SHELL_DEBUG
 	set -x
