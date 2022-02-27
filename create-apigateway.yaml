@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create API Gateway API
+
+Parameters:
+  StageNameParameter:
+    Type: String
+    Default: prod
+    Description: The name of the stage
+
+Resources:
+
+  ApiGatewayRestApi:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: "my-cfn-api"
+
+  ApiGatewayResourceGreet:
+    Type: "AWS::ApiGateway::Resource"
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      PathPart: "greet"
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      
+  ApiGatewayResourceName:
+    Type: "AWS::ApiGateway::Resource"
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      PathPart: "{name}"
+      ParentId: !Ref ApiGatewayResourceGreet
+
+  ApiGatewayMethodGet:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      AuthorizationType: "NONE"
+      RestApiId: !Ref ApiGatewayRestApi
+      ResourceId: !Ref ApiGatewayResourceName
+      HttpMethod: "GET"
+      RequestParameters: 
+        "method.request.path.name": true
+      MethodResponses: 
+        - 
+          StatusCode: "200"
+      Integration: 
+          RequestTemplates:
+            "application/json": "{\n \"statusCode\": 200\n}"
+          IntegrationResponses: 
+            - 
+              ResponseTemplates: 
+                  "application/json": |
+                      {
+                          "hello": "$input.params('name')"
+                      }
+              StatusCode: "200"
+          Type: "MOCK"
+
+  ApiGatewayDeployment:
+    Type: "AWS::ApiGateway::Deployment"
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+    DependsOn: ApiGatewayMethodGet
+
+  ApiGatewayStage:
+    Type: "AWS::ApiGateway::Stage"
+    Properties:
+      StageName: !Ref StageNameParameter
+      DeploymentId: !Ref ApiGatewayDeployment
+      RestApiId: !Ref ApiGatewayRestApi
+
+Outputs:
+  ApiGatewayRestApi:
+    Description: The API Gateway id
+    Value: !Ref ApiGatewayRestApi
+  ApiInvokeUrl:
+    Description: The API Invoke URL
+    Value: !Sub
+      - 'https://${restapi_id}.execute-api.${AWS::Region}.amazonaws.com/${stage}'
+      - restapi_id: !Ref ApiGatewayRestApi
+        stage: !Ref StageNameParameter 
