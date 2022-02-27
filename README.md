@@ -34,8 +34,11 @@ Starter repo for the AWS environment deployer (https://github.com/leonjohan3/aws
 - [Jinja2 Templates](<https://jinja2docs.readthedocs.io/en/stable/templates.html>)
 - [AWS API Gateway](<https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html>)
 - [former2 cli](<https://github.com/iann0036/former2/blob/master/cli/README.md>)
+- [aws cli query](<https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-filter.html>)
 
 # Notes
 ```
 aws cloudformation describe-stacks --stack-name apigateway-stack --query "Stacks[0].Outputs[?OutputKey=='ApiInvokeUrl'].OutputValue" --output text
+aws cloudformation describe-stack-events --stack-name apigateway-stack --max-items 1 --output text --query "StackEvents[0].[LogicalResourceId, ResourceType, Timestamp, ResourceStatus]"
+aws cloudformation describe-stacks --stack-name apigateway-stack --output text --query "Stacks[0].StackStatus"
 ```
